@@ -74,10 +74,6 @@ def main():
         response = requests.post(request_address, json=message)
     print(response.json())
 
-    while 1:
-        response = requests.get(request_address)
-        print(response.json())
-
 
 if __name__ == "__main__":
     main()
