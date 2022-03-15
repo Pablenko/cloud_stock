@@ -80,7 +80,8 @@ class MatchingEngine:
             items_left, transaction_value = self._process_buy_offer(order.quantity, order.price)
 
         if items_left > 0:
-            self.book.insert(LimitOrder(id=order.id, price=order.price, quantity=items_left, side=order.side))
+            self.book.insert(LimitOrder(id=order.id, name=order.name, price=order.price, quantity=items_left,
+                                        side=order.side))
 
         return transaction_value
 

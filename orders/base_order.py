@@ -3,6 +3,7 @@ from pydantic import BaseModel, validator
 
 class BaseOrder(BaseModel):
     id: str
+    name: str
 
     @validator("id")
     def must_be_4_characters(cls, id_to_match):

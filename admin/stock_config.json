@@ -1,0 +1,16 @@
+{
+    "stock" : {
+        "papers" : [
+            "nvidia",
+            "apple",
+            "microsoft",
+            "tesla",
+            "amd",
+            "intel",
+            "amazon",
+            "pfizer",
+            "netflix",
+            "lockheed"
+        ]
+    }
+}

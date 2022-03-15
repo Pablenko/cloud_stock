@@ -12,17 +12,21 @@ def parse_args():
 def parse_market_order():
     print("Id: ")
     id = str(input())
+    print("Name: ")
+    name = str(input())
     print("Side: ")
     side = str(input())
     print("Quantity: ")
     quantity = int(input())
 
-    return {"id": id, "side": side, "quantity": quantity}
+    return {"id": id, "name": name, "side": side, "quantity": quantity}
 
 
 def parse_limit_order():
     print("Id: ")
     id = str(input())
+    print("Name: ")
+    name = str(input())
     print("Side: ")
     side = str(input())
     print("Quantity: ")
@@ -30,14 +34,16 @@ def parse_limit_order():
     print("Price: ")
     price = int(input())
 
-    return {"id": id, "side": side, "quantity": quantity, "price": price}
+    return {"id": id, "name": name, "side": side, "quantity": quantity, "price": price}
 
 
 def parse_cancel_order():
     print("Id: ")
     id = str(input())
+    print("Name: ")
+    name = str(input())
 
-    return {"id": id}
+    return {"id": id, "name": name,}
 
 
 def main():
