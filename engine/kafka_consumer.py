@@ -1,7 +1,10 @@
 import argparse
-from admin.configuration import load_configuration
+import json
 from confluent_kafka import Consumer
+
+from admin.configuration import load_configuration
 from engine.matching_engine import MatchingEngine
+from orders.codecs import decode
 
 
 def create_consumer(paper_name, stock_configuration):
@@ -40,12 +43,12 @@ def main():
             print("Consumer error: {}".format(msg.error()))
             continue
 
-        print('Received message: {}'.format(msg.value().decode('utf-8')))
-
-        #matching_engine.process(msg)
-
+        msg_payload_str = msg.value().decode('utf-8')
+        print('Received message: {}'.format(msg_payload_str))
+        order = decode(json.loads(msg_payload_str))
+        transaction_value = matching_engine.process(order)
         ret_val = consumer.commit(message=msg)
-        print("Committed message, retval: {}".format(ret_val))
+        print("Committed message, retval: {} transaction_val {}".format(ret_val, transaction_value))
 
 
 if __name__ == "__main__":

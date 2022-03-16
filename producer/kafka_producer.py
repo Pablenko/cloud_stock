@@ -3,6 +3,8 @@ from confluent_kafka import Producer
 from fastapi import FastAPI
 
 from admin.configuration import load_configuration
+from orders.codecs import encode
+from orders.base_order import BaseOrder
 from orders.limit_order import LimitOrder
 from orders.market_order import MarketOrder
 from orders.cancel_order import CancelOrder
@@ -13,44 +15,51 @@ producer = Producer({'bootstrap.servers': 'localhost:9093'})
 config = load_configuration()
 
 
-def delivery_report(err, msg):
-    if err is not None:
-        print('Message delivery failed: {}'.format(err))
-    else:
-        print('Message delivered to {} [{}]'.format(msg.topic(), msg.partition()))
+def push_to_kafka(topic_name: str, msg: dict) -> bool:
+    delivery_status = False
 
+    def delivery_report(err, msg_report):
+        nonlocal delivery_status
+        if err is not None:
+            print('Message delivery failed: {}'.format(err))
+        else:
+            delivery_status = True
+            print('Message delivered to {} [{}]'.format(msg_report.topic(), msg_report.partition()))
 
-def push_to_kafka(data: dict):
     producer.poll(0)
-    producer.produce(data["name"], json.dumps(data).encode('utf-8'), callback=delivery_report)
+    producer.produce(topic_name, json.dumps(msg).encode('utf-8'), callback=delivery_report)
     producer.flush()
+    return delivery_status
 
 
-def validate_request(data: dict):
-    if data["name"] not in config["stock"]["papers"]:
+def validate_request(topic_name: str):
+    if topic_name not in config["stock"]["papers"]:
         return False
     return True
 
 
-def handle_order(order):
+def handle_order(order: BaseOrder, order_type: str):
     data = json.loads(order.json())
-    if validate_request(data):
-        push_to_kafka(data)
-        return {"transaction_status": "SUCCESS"}
-    else:
-        return {"transaction_status": "FAILED"}
+    topic_name = data["name"]
+    if validate_request(topic_name):
+        msg = encode(data, order_type)
+        delivery_status = push_to_kafka(topic_name, msg)
+        if delivery_status:
+            return {"transaction_status": "SUCCESS"}
+
+    return {"transaction_status": "FAILED"}
 
 
 @app.post("/market_order")
 def handle_market_order(order: MarketOrder):
-    return handle_order(order)
+    return handle_order(order, "market_order")
 
 
 @app.post("/limit_order")
-def handle_market_order(order: LimitOrder):
-    return handle_order(order)
+def handle_limit_order(order: LimitOrder):
+    return handle_order(order, "limit_order")
 
 
 @app.post("/cancel_order")
 def handle_cancel_order(order: CancelOrder):
-    return handle_order(order)
+    return handle_order(order, "cancel_order")

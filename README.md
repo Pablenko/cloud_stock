@@ -5,15 +5,14 @@ Currently project is in development process. If you have any ideas, feel
 free to add issue.
 
 
-### Installation In Dev/Editable mode
+### Installation
 ```
 pip install -e .
 ```
 
-### Testing
+### Unit testing
 ```
 pytest -svx
-
 ```
 
 #### Author
