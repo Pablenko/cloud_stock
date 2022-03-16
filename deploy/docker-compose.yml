@@ -25,10 +25,15 @@ services:
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
     depends_on:
       - zookeeper
+  service_discovery:
+    image: cloud_trading_discovery:latest
+    depends_on:
+      - kafka
+    network_mode: "host"
   producer:
     image: cloud_trading_producer:latest
     depends_on:
-      - kafka
+      - service_discovery
     network_mode: "host"
   consumer:
     image: cloud_trading_consumer:latest

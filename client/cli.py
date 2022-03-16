@@ -54,7 +54,6 @@ def main():
     print("1 - market order")
     print("2 - limit order")
     print("3 - cancel order")
-    print("4 - request book")
 
     order_type = int(input())
 
@@ -67,8 +66,6 @@ def main():
     elif order_type == 3:
         message = parse_cancel_order()
         url_content = "cancel_order"
-    elif order_type == 4:
-        url_content = "book"
     else:
         raise ValueError("Wrong order type")
 

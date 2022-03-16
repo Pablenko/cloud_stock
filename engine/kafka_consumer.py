@@ -1,11 +1,20 @@
-import argparse
 import json
 import sys
+import requests
 from confluent_kafka import Consumer
 
 from admin.configuration import load_configuration
 from engine.matching_engine import MatchingEngine
+from service_discovery.service import SERVICE_DISCOVERY_PORT
 from orders.codecs import decode
+
+
+def request_service():
+    request_address = "http://127.0.0.1:" + str(SERVICE_DISCOVERY_PORT) + "/request_service"
+    response = requests.get(request_address)
+    response_json = response.json()
+    print(response_json)
+    return response_json["SERVICE_NAME"]
 
 
 def create_consumer(paper_name, stock_configuration):
@@ -23,21 +32,19 @@ def create_consumer(paper_name, stock_configuration):
     return consumer
 
 
-def parse_args():
-    ap = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    ap.add_argument("--paper", required=True, type=str, help="Name of paper for which subscribe to.")
-    args = ap.parse_args()
-    return args
-
-
 def main():
-    args = parse_args()
-    print("Starting consumer for {}".format(args.paper))
+    paper_name = request_service()
+    if paper_name == "UNKNOWN":
+        print("Received service UNKNOWN!. Couldn't start service.")
+        return
+
+    print("Starting consumer for {}".format(paper_name))
     config = load_configuration()
-    consumer = create_consumer(args.paper, config)
+    consumer = create_consumer(paper_name, config)
     matching_engine = MatchingEngine()
 
-    print("Consumer {} started".format(args.paper))
+    print("Consumer {} started".format(paper_name))
+    sys.stdout.flush()
     while True:
         msg = consumer.poll(1.0)
         if msg is None:

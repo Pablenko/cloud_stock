@@ -1,7 +1,7 @@
 ## Cloud stock projecy
 
 Purpose of this project is to create cloud stock platform for trading.
-Currently project is in development process. If you have any ideas, feel
+Currently project is under development process. If you have any ideas, feel
 free to add issue.
 
 ### Technology stack
@@ -12,7 +12,7 @@ Kafka, docker-compose, python, FastApi
 ### Run test environment
 ```
 ./build_images.sh
-cd deploy && docker-compose up -d
+cd deploy && docker-compose up -d --scale consumer=10
 ```
 
 ### Create orders
@@ -27,9 +27,7 @@ pytest -svx
 
 ### Work in progress
 
-- Switching from docker-compose to Kubernetes
 - GUI for order creation/management
-- Proper management of engine crash
 
 #### Author
 Paweł Przybylski
