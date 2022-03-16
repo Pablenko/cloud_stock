@@ -25,6 +25,18 @@ services:
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
     depends_on:
       - zookeeper
+  producer:
+    image: cloud_trading_producer:latest
+    depends_on:
+      - kafka
+    network_mode: "host"
+  consumer:
+    image: cloud_trading_consumer:latest
+    environment:
+      - PAPER_TYPE=intel
+    depends_on:
+      - producer
+    network_mode: "host"
 
 volumes:
   zookeeper_data:
