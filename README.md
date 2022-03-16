@@ -13,6 +13,7 @@ Kafka, docker-compose, python, FastApi
 ```
 ./build_images.sh
 cd deploy && docker-compose up -d --scale consumer=10
+cd admin && python kafka-admin.py --reset
 ```
 
 ### Create orders
@@ -27,6 +28,7 @@ pytest -svx
 
 ### Work in progress
 
+- Management of matching engine crash
 - GUI for order creation/management
 
 #### Author

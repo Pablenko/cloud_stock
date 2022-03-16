@@ -54,9 +54,10 @@ def main():
             continue
 
         msg_payload_str = msg.value().decode('utf-8')
-        print('Received message: {}'.format(msg_payload_str))
         order = decode(json.loads(msg_payload_str))
         transaction_value = matching_engine.process(order)
+        # It will change in next iteration. Not completed LimitOrders should not be committed, because
+        # after engine crash OrderBook will be lost. Management of crash is under development.
         ret_val = consumer.commit(message=msg)
         print("Committed message, retval: {} transaction_val {}".format(ret_val, transaction_value))
         sys.stdout.flush()
