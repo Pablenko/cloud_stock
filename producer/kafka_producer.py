@@ -1,5 +1,5 @@
 import json
-from confluent_kafka import Producer
+from confluent_kafka import Producer, KafkaException
 from fastapi import FastAPI
 
 from admin.configuration import load_configuration
@@ -11,8 +11,10 @@ from orders.cancel_order import CancelOrder
 
 
 app = FastAPI()
-producer = Producer({'bootstrap.servers': 'localhost:9093'})
+producer = Producer({'bootstrap.servers': 'localhost:9093',
+                     'transactional.id': 'producer_1_id'})
 config = load_configuration()
+producer.init_transactions()
 
 
 def push_to_kafka(topic_name: str, msg: dict) -> bool:
@@ -26,9 +28,16 @@ def push_to_kafka(topic_name: str, msg: dict) -> bool:
             delivery_status = True
             print('Message delivered to {} [{}]'.format(msg_report.topic(), msg_report.partition()))
 
-    producer.poll(0)
-    producer.produce(topic_name, json.dumps(msg).encode('utf-8'), callback=delivery_report)
-    producer.flush()
+    try:
+        producer.begin_transaction()
+        producer.produce(topic_name, json.dumps(msg).encode('utf-8'), callback=delivery_report)
+        producer.commit_transaction()
+    except KafkaException as kafka_expection:
+        print("Transaction failed! Exception: {}".format(str(kafka_expection)))
+        producer.abort_transaction()
+    else:
+        delivery_status = True
+
     return delivery_status
 
 

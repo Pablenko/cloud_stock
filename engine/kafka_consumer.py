@@ -26,6 +26,7 @@ def create_consumer(paper_name, stock_configuration):
         'group.id': 'group_id',
         'auto.offset.reset': 'earliest',
         'enable.auto.commit': False,
+        'isolation.level': 'read_committed',
     })
 
     consumer.subscribe([paper_name])
