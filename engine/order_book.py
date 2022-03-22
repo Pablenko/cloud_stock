@@ -1,5 +1,4 @@
 from heapq import heappush, heappop, heapify
-from orders.limit_order import LimitOrder
 
 
 class MaxHeapObj(object):
@@ -19,7 +18,7 @@ class OrderBook:
         self.buy_book = []
         self.sell_book = []
 
-    def insert(self, order: LimitOrder):
+    def insert(self, order):
         if order.side == "S":
             heappush(self.sell_book, MinHeapObj(order))
         else:
