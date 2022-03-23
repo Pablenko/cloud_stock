@@ -9,9 +9,9 @@ from orders.cancel_order import CancelOrder
 VERY_BIG_NUM = 1000000
 
 
-class WrappedLimitOrder(LimitOrder):
+class LimitOrderWithContext(LimitOrder):
     total_transaction_value: int
-    total_quanity: int
+    total_quantity: int
 
 
 class MatchingEngine:
@@ -45,14 +45,18 @@ class MatchingEngine:
                     remaining_items -= buy_elem.quantity
                     transaction_value += buy_elem.quantity * buy_elem.price
                     buy_elem.total_transaction_value += transaction_value
-                    self.completed_transactions.append(TransactionStatus(id=buy_elem.id,
-                                                                         count=buy_elem.total_quanity,
-                                                                         transaction_value=buy_elem.total_transaction_value))
+                    self.completed_transactions.append(
+                        TransactionStatus(
+                            id=buy_elem.id,
+                            count=buy_elem.total_quantity,
+                            transaction_value=buy_elem.quantity * buy_elem.price,
+                        )
+                    )
                     self.book.pop_buy()
                 else:
                     buy_elem.quantity -= remaining_items
                     transaction_value += remaining_items * buy_elem.price
-                    buy_elem.total_transaction_value += transaction_value
+                    buy_elem.total_transaction_value += remaining_items * buy_elem.price
                     remaining_items = 0
                     break
             else:
@@ -71,14 +75,18 @@ class MatchingEngine:
                     remaining_items -= sell_item.quantity
                     transaction_value += sell_item.quantity * sell_item.price
                     sell_item.total_transaction_value += transaction_value
-                    self.completed_transactions.append(TransactionStatus(id=sell_item.id,
-                                                                         count=sell_item.total_quanity,
-                                                                         transaction_value=sell_item.total_transaction_value))
+                    self.completed_transactions.append(
+                        TransactionStatus(
+                            id=sell_item.id,
+                            count=sell_item.total_quantity,
+                            transaction_value=sell_item.quantity * sell_item.price,
+                        )
+                    )
                     self.book.pop_sell()
                 else:
                     sell_item.quantity -= remaining_items
                     transaction_value += remaining_items * sell_item.price
-                    sell_item.total_transaction_value += transaction_value
+                    sell_item.total_transaction_value += remaining_items * sell_item.price
                     remaining_items = 0
                     break
             else:
@@ -92,9 +100,13 @@ class MatchingEngine:
         else:
             items_left, transaction_value = self._process_buy_offer(order.quantity, VERY_BIG_NUM)
 
-        self.completed_transactions.append(TransactionStatus(id=order.id,
-                                                             count=order.quantity-items_left,
-                                                             transaction_value=transaction_value))
+        self.completed_transactions.append(
+            TransactionStatus(
+                id=order.id,
+                count=order.quantity - items_left,
+                transaction_value=transaction_value,
+            )
+        )
 
     def _process_limit_order(self, order: LimitOrder):
         if order.side == "S":
@@ -103,16 +115,26 @@ class MatchingEngine:
             items_left, transaction_value = self._process_buy_offer(order.quantity, order.price)
 
         if items_left > 0:
-            self.book.insert(WrappedLimitOrder(id=order.id, name=order.name, price=order.price, quantity=items_left,
-                                               side=order.side, total_transaction_value=transaction_value,
-                                               total_quanity=order.quantity))
+            self.book.insert(
+                LimitOrderWithContext(
+                    id=order.id,
+                    name=order.name,
+                    price=order.price,
+                    quantity=items_left,
+                    side=order.side,
+                    total_transaction_value=transaction_value,
+                    total_quantity=order.quantity,
+                )
+            )
         else:
-            self.completed_transactions.append(TransactionStatus(id=order.id,
-                                                                 count=order.quantity,
-                                                                 transaction_value=transaction_value))
+            self.completed_transactions.append(
+                TransactionStatus(
+                    id=order.id,
+                    count=order.quantity,
+                    transaction_value=transaction_value,
+                )
+            )
 
     def _process_cancel_order(self, order: CancelOrder):
         self.book.remove(order.id)
-        self.completed_transactions.append(TransactionStatus(id=order.id,
-                                                             count=0,
-                                                             transaction_value=0))
+        self.completed_transactions.append(TransactionStatus(id=order.id, count=0, transaction_value=0))

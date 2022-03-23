@@ -43,7 +43,10 @@ def parse_cancel_order():
     print("Name: ")
     name = str(input())
 
-    return {"id": id, "name": name,}
+    return {
+        "id": id,
+        "name": name,
+    }
 
 
 def main():
@@ -71,10 +74,7 @@ def main():
 
     request_address = ip_address + url_content
 
-    if order_type == 4:
-        response = requests.get(request_address)
-    else:
-        response = requests.post(request_address, json=message)
+    response = requests.post(request_address, json=message)
     print(response.json())
 
 

@@ -4,9 +4,7 @@ from pathlib import Path
 
 
 STOCK_CONFIGURATION_FILE = "stock_config.json"
-MANAGEMENT_TOPICS = {
-    "transactions_completed_topic": "completed"
-}
+MANAGEMENT_TOPICS = {"transactions_completed_topic": "completed"}
 
 
 def load_configuration():

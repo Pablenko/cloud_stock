@@ -5,8 +5,12 @@ from admin.configuration import load_configuration, MANAGEMENT_TOPICS
 
 def parse_args():
     ap = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    ap.add_argument("--reset", default=False, action="store_true",
-                    help="Reset topic in case on invalid conf.")
+    ap.add_argument(
+        "--reset",
+        default=False,
+        action="store_true",
+        help="Reset topic in case on invalid conf.",
+    )
     args = ap.parse_args()
     return args
 
@@ -50,7 +54,13 @@ def create_stock_topics(admin, stock_configuration):
 
 
 def create_management_topics(admin):
-    topics = [NewTopic(MANAGEMENT_TOPICS["transactions_completed_topic"], num_partitions=1, replication_factor=1)]
+    topics = [
+        NewTopic(
+            MANAGEMENT_TOPICS["transactions_completed_topic"],
+            num_partitions=1,
+            replication_factor=1,
+        )
+    ]
     _create_topics(admin, topics)
 
 
@@ -70,7 +80,7 @@ def delete_topics(admin):
 
 def main():
     args = parse_args()
-    admin = AdminClient({'bootstrap.servers': 'localhost:9093'})
+    admin = AdminClient({"bootstrap.servers": "localhost:9093"})
     stock_configuration = load_configuration()
     valid = validate_if_all_present(admin, stock_configuration)
     if valid:

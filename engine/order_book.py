@@ -2,15 +2,25 @@ from heapq import heappush, heappop, heapify
 
 
 class MaxHeapObj(object):
-    def __init__(self, order): self.order = order
-    def __lt__(self, other): return self.order.price > other.order.price
-    def __eq__(self, other): return self.order.price == other.order.price
+    def __init__(self, order):
+        self.order = order
+
+    def __lt__(self, other):
+        return self.order.price > other.order.price
+
+    def __eq__(self, other):
+        return self.order.price == other.order.price
 
 
 class MinHeapObj(object):
-    def __init__(self, order): self.order = order
-    def __lt__(self, other): return self.order.price < other.order.price
-    def __eq__(self, other): return self.order.price == other.order.price
+    def __init__(self, order):
+        self.order = order
+
+    def __lt__(self, other):
+        return self.order.price < other.order.price
+
+    def __eq__(self, other):
+        return self.order.price == other.order.price
 
 
 class OrderBook:

@@ -11,8 +11,7 @@ from orders.cancel_order import CancelOrder
 
 
 app = FastAPI()
-producer = Producer({'bootstrap.servers': 'localhost:9093',
-                     'transactional.id': 'producer_1_id'})
+producer = Producer({"bootstrap.servers": "localhost:9093", "transactional.id": "producer_1_id"})
 config = load_configuration()
 producer.init_transactions()
 
@@ -23,14 +22,14 @@ def push_to_kafka(topic_name: str, msg: dict) -> bool:
     def delivery_report(err, msg_report):
         nonlocal delivery_status
         if err is not None:
-            print('Message delivery failed: {}'.format(err))
+            print("Message delivery failed: {}".format(err))
         else:
             delivery_status = True
-            print('Message delivered to {} [{}]'.format(msg_report.topic(), msg_report.partition()))
+            print("Message delivered to {} [{}]".format(msg_report.topic(), msg_report.partition()))
 
     try:
         producer.begin_transaction()
-        producer.produce(topic_name, json.dumps(msg).encode('utf-8'), callback=delivery_report)
+        producer.produce(topic_name, json.dumps(msg).encode("utf-8"), callback=delivery_report)
         producer.commit_transaction()
     except KafkaException as kafka_expection:
         print("Transaction failed! Exception: {}".format(str(kafka_expection)))
