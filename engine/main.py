@@ -62,7 +62,7 @@ def generate_transaction_report(transaction_status: TransactionStatus, paper_nam
     return TransactionReport(
         id=transaction_status.id,
         count=transaction_status.count,
-        transaction_status=transaction_status.transaction_value,
+        transaction_value=transaction_status.transaction_value,
         name=paper_name,
         timestamp=timestamp_str,
     )
@@ -96,7 +96,7 @@ def main():
         completed_stock_reports = [generate_transaction_report(st, paper_name) for st in completed_stock_transactions]
 
         try:
-            producer.init_transactions()
+            producer.begin_transaction()
             for report in completed_stock_reports:
                 producer.produce(
                     MANAGEMENT_TOPICS["transactions_completed_topic"],
@@ -104,8 +104,8 @@ def main():
                     callback=producer_callback,
                 )
             producer.send_offsets_to_transaction(
-                positions=[msg_commit_data],
-                group_metadata=consumer.consumer_group_metadata(),
+                [msg_commit_data],
+                consumer.consumer_group_metadata(),
             )
             producer.commit_transaction()
         except KafkaException as kafka_expection:
