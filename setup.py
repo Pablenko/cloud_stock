@@ -12,7 +12,7 @@ setuptools.setup(
     entry_points={
         "console_scripts": [
             "trading_cloud_producer=producer.kafka_producer:main",
-            "trading_cloud_engine=engine.kafka_consumer:main",
+            "trading_cloud_engine=engine.main:main",
         ]
     },
 )

@@ -75,7 +75,7 @@ def main():
         return
 
     config = load_configuration()
-    consumer, consumer_group_id = create_consumer(paper_name, config)
+    consumer = create_consumer(paper_name, config)
     producer = create_producer(paper_name)
     matching_engine = MatchingEngine()
 
@@ -105,7 +105,7 @@ def main():
                 )
             producer.send_offsets_to_transaction(
                 positions=[msg_commit_data],
-                group_metadata=consumer.get_consumer_group_metadata(),
+                group_metadata=consumer.consumer_group_metadata(),
             )
             producer.commit_transaction()
         except KafkaException as kafka_expection:
