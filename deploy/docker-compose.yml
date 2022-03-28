@@ -1,6 +1,14 @@
 version: "2"
 
 services:
+  db:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=cloud_stock
   zookeeper:
     image: docker.io/bitnami/zookeeper:3.7
     ports:

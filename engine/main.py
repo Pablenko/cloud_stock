@@ -100,7 +100,7 @@ def main():
             for report in completed_stock_reports:
                 producer.produce(
                     MANAGEMENT_TOPICS["transactions_completed_topic"],
-                    json.dumps(report).encode("utf-8"),
+                    report.json().encode("utf-8"),
                     callback=producer_callback,
                 )
             producer.send_offsets_to_transaction(
